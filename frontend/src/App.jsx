@@ -4,6 +4,7 @@ import Dashboard from './pages/SupplierDashboard';
 import LanguagePage from './pages/LanguagePage';
 import './App.css';
 import Vendorhomepage  from './pages/Vendorhomepage';
+import ReviewPage from "./pages/ReviewPage"; 
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/signup" element={<AuthForm mode="signup" />} />
       <Route path="/language" element={<LanguagePage />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard/review" element={<ReviewPage />} />
       <Route path="/Vendorhomepage" element={<Vendorhomepage/>} />
     </Routes>
   );
