@@ -23,41 +23,54 @@ const Vendorhomepage = () => {
             navRef.current.scrollLeft += scrollOffset;
         }
     };
+     const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("Select Location");
+  const locations = ["Surat", "Ahmedabad", "Rajkot", "Vadodara", "Gandhinagar"];
+
+  const toggleDropdown = () => setShowDropdown(!showDropdown);
+  const selectCity = (city) => {
+    setSelectedCity(city);
+    setShowDropdown(false);
+  };
 
     return (
          <div className="vendor-page-container">
             <header className="vendor-header">
-                <div className="top-bar">
-                    <div className="left-section">
-                        <h1 className="logo">VendorVerse</h1>
-                        <div className="location-selector">
-                            <span>Select Location</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                        </div>
-                    </div>
-                    <div className="center-section">
-                        <div className="search-bar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                            <input type="text" placeholder='Search for "banana"' />
-                        </div>
-                    </div>
-                    <div className="right-section">
-                        <div className="super-saver">
-                            <span className="saver-text">SUPER SAVER</span>
-                            <div className="toggle-bg">
-                                <div className="toggle-switch"></div>
-                            </div>
-                        </div>
-                        <div className="user-action">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            <span>Login</span>
-                        </div>
-                        <div className="user-action">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.16"/></svg>
-                            <span>Cart</span>
-                        </div>
-                    </div>
-                </div>
+               <div className="top-bar">
+  <h1 className="logo">VendorVerse</h1>
+
+  <div className="right-header">
+    <div className="location-selector-wrapper">
+  <div className="location-selector" onClick={toggleDropdown}>
+    <span>{selectedCity}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  </div>
+
+  {showDropdown && (
+    <ul className="location-dropdown">
+      {locations.map((city) => (
+        <li key={city} onClick={() => selectCity(city)}>
+          {city}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
+
+
+    <div className="search-bar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder='Search for "banana"' />
+    </div>
+
+    <div className="user-action">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Logout</span>
+    </div>
+  </div>
+</div>
+
+
                 <div className="category-nav-container">
                      <button className="scroll-arrow left" onClick={() => scroll(-250)}>&lt;</button>
                     <nav className="category-nav" ref={navRef}>
