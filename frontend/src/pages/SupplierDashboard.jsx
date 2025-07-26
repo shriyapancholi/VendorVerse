@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../SupplierDashboard.css";
+import "../styles/SupplierDashboard.css";
 import SupplierHeader from "../components/SupplierHeader";
 import CategoryNav from "../components/CategoryNav";
 import InventoryList from "../components/InventoryList";

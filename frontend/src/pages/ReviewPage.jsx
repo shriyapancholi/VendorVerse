@@ -2,7 +2,7 @@
 import React from "react";
 import SupplierHeader from "../components/SupplierHeader";
 import SupplierReviews from "../components/SupplierReviews";
-import "../SupplierDashboard.css"; // reuse dashboard styling
+import "../styles/SupplierDashboard.css";
 
 export default function ReviewPage() {
   return (
