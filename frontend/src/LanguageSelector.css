@@ -1,0 +1,85 @@
+.language-selector {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.language-selector h2 {
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+.language-selector ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.language-selector li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin: 6px 0;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.language-selector li:hover {
+  background-color: #f7f7f7;
+}
+
+.language-selector li.selected {
+  border-color: #6AA84F;
+  background-color: #eaf6e9;
+}
+
+.symbol {
+  font-size: 1.4rem;
+  font-weight: bold;
+  background: #220866;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.language-selector li span {
+  flex-grow: 1;
+  text-align: left;
+  font-size: 1rem;
+  color: #333;
+}
+
+.check-icon {
+  color: #4CAF50;
+  font-size: 1.2rem;
+}
+
+.language-selector button {
+  background-color: #6AA84F;
+  color: white;
+  padding: 10px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.language-selector button:hover {
+  background-color: #5a9542;
+}
