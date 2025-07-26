@@ -5,6 +5,7 @@ import LanguagePage from './pages/LanguagePage';
 import './App.css';
 import Vendorhomepage  from './pages/Vendorhomepage';
 import ReviewPage from "./pages/ReviewPage"; 
+import AnalyticsPage from './pages/AnalyticsPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/dashboard/review" element={<ReviewPage />} />
       <Route path="/Vendorhomepage" element={<Vendorhomepage/>} />
+      <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
     </Routes>
   );
 }
