@@ -8,7 +8,11 @@ export default function AuthForm({ mode }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (mode === "login") {
+    navigate("/language"); 
+  } else {
     navigate("/dashboard");
+  }
   };
 
   return (
