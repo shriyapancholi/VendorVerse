@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
-import './LanguageSelector.css';
+import './styles/LanguageSelector.css';
+
 import { useNavigate } from 'react-router-dom';
 
 const languages = [

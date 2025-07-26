@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FaCarrot, FaAppleAlt, FaCheese, FaOilCan, FaStore, FaDrumstickBite, FaLeaf, FaHotdog } from 'react-icons/fa';
-import '../Vendorhomepage.css'; // Make sure to create and link this CSS file
+import '../styles/Vendorhomepage.css'; // Make sure to create and link this CSS file
 
 // --- Data for the category navigation ---
 const categories = [
