@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthForm from './components/AuthForm';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/SupplierDashboard';
 import LanguagePage from './pages/LanguagePage';
 import './App.css';
 import Vendorhomepage  from './pages/Vendorhomepage';
