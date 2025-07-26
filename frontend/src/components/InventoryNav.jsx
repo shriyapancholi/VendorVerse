@@ -6,24 +6,23 @@ export default function InventoryList({ items, categoryFilter }) {
         : items.filter((item) => item.category === categoryFilter);
 
     return (
-        <div className="inventory-list">
-            {filtered.length === 0 ? (
-                <p className="empty">No items in this category yet.</p>
-            ) : (
-                filtered.map((item, idx) => (
-                    <div className="inventory-card" key={idx}>
-                        <div>
-                            <strong>{item.name}</strong>
-                            <p>{item.description}</p>
-                            <p>{item.quantity} {item.unit}</p>
-                            <p>₹{item.price}</p>
-                            <p>Quality: {item.quality}</p>
-                            <p>Status: {item.status}</p>
-                        </div>
-                        {item.surplus && <span className="surplus-tag">Surplus</span>}
-                    </div>
-                ))
-            )}
-        </div>
-    );
+        <div
+  key={idx}
+  className={`relative ${colorClass} border-2 rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-200 ease-in-out`}
+>
+  {/* Surplus tag */}
+  {item.surplus && (
+    <span className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+      Surplus
+    </span>
+  )}
+
+  {/* Item Info */}
+  <h2 className="text-xl font-bold text-gray-800">{item.name}</h2>
+  <p className="text-sm text-gray-700">{item.quantity} {item.unit}</p>
+  <p className="text-base text-green-800 font-semibold">₹{item.price}</p>
+  <p className="text-sm text-gray-800">Quality: {item.quality}</p>
+  <p className="text-sm text-gray-800">Status: {item.status || "—"}</p>
+</div>
+    )
 }
