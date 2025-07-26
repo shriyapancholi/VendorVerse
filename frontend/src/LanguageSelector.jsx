@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
 import './LanguageSelector.css';
+import { useNavigate } from 'react-router-dom';
 
 const languages = [
   { id: 'en', name: 'English', symbol: 'A' },
@@ -20,18 +21,20 @@ const languages = [
 ];
 
 const LanguageSelector = ({ onSelect }) => {
-  const [selectedLang, setSelectedLang] = useState('en');
-
+  const [selectedLang, setSelectedLang] = useState(null);
+    const navigate = useNavigate();
   const handleSelect = (id) => {
     setSelectedLang(id);
-    if (onSelect) onSelect(id);
+
   };
 
   const handleProceed = () => {
-    alert(`Selected Language: ${selectedLang}`);
-    // Optional: store in localStorage or navigate
+    if (selectedLang && onSelect) {
+      onSelect(selectedLang);
+      navigate('/Vendorhomepage'); 
+    }
   };
-
+;
   return (
     <div className="language-selector">
       <h2>Select Your Language</h2>
@@ -50,7 +53,13 @@ const LanguageSelector = ({ onSelect }) => {
           </li>
         ))}
       </ul>
-      <button onClick={handleProceed}>Proceed</button>
+      <button
+        onClick={handleProceed}
+        disabled={!selectedLang}
+        className={selectedLang ? '' : 'disabled'}
+      >
+        Proceed
+      </button> 
     </div>
   );
 };

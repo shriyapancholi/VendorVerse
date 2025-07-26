@@ -3,6 +3,7 @@ import AuthForm from './components/AuthForm';
 import Dashboard from './pages/Dashboard';
 import LanguagePage from './pages/LanguagePage';
 import './App.css';
+import Vendorhomepage  from './pages/Vendorhomepage';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/signup" element={<AuthForm mode="signup" />} />
       <Route path="/language" element={<LanguagePage />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/Vendorhomepage" element={<Vendorhomepage/>} />
     </Routes>
   );
 }

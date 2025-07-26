@@ -83,3 +83,8 @@
 .language-selector button:hover {
   background-color: #5a9542;
 }
+
+.language-selector button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
