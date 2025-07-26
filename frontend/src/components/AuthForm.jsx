@@ -8,68 +8,69 @@ export default function AuthForm({ mode }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Validate and authenticate here
     navigate("/dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-sky-100 to-pink-100 flex items-center justify-center px-4 py-8">
-      <div className="bg-white shadow-lg rounded-2xl overflow-hidden flex flex-col md:flex-row w-full max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-sky-100 to-pink-100 flex items-center justify-center px-6">
+      <div className="bg-white rounded-3xl shadow-2xl flex overflow-hidden w-full max-w-5xl min-h-[600px]">
         {/* Left Panel */}
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center p-10 md:w-5/12">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold">
+        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center p-12 w-1/2">
+          <div className="text-center space-y-4">
+            <h2 className="text-5xl font-bold">
               {isSignup ? "Welcome!" : "Welcome Back!"}
             </h2>
-            <p className="text-sm text-blue-100">
-              {isSignup ? "Let's get you started!" : "Happy to see you again"}
+            <p className="text-lg text-blue-100">
+              {isSignup ? "Let’s get you started!" : "Happy to see you again"}
             </p>
           </div>
         </div>
 
         {/* Right Panel */}
-        <div className="p-10 md:w-7/12 w-full space-y-6">
-          <h3 className="text-2xl font-semibold text-center text-gray-800">
+        <div className="flex flex-col justify-center items-center w-1/2 p-12">
+          <h3 className="text-3xl font-bold text-gray-800 mb-8">
             {isSignup ? "Create Account" : "Login"}
           </h3>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="w-full space-y-6">
             {isSignup && (
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Full Name"
-                  className="w-full py-3 pl-10 pr-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none text-gray-800 text-base"
+                  className="w-full h-14 pl-12 pr-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none text-gray-800 text-lg"
                 />
               </div>
             )}
+
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full py-3 pl-10 pr-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none text-gray-800 text-base"
+                className="w-full h-14 pl-12 pr-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none text-gray-800 text-lg"
               />
             </div>
+
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full py-3 pl-10 pr-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none text-gray-800 text-base"
+                className="w-full h-14 pl-12 pr-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none text-gray-800 text-lg"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-md font-semibold transition"
+              className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-4 text-lg rounded-md font-semibold transition"
             >
               {isSignup ? "Sign Up" : "Login"}
             </button>
           </form>
 
-          <div className="text-center text-sm text-gray-600">
+          <p className="mt-8 text-base text-gray-600">
             {isSignup ? (
               <>
                 Already have an account?{" "}
@@ -91,7 +92,7 @@ export default function AuthForm({ mode }) {
                 </button>
               </>
             )}
-          </div>
+          </p>
         </div>
       </div>
     </div>
