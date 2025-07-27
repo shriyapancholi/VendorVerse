@@ -5,7 +5,7 @@ import '../styles/BuyingPage.css';
 const BuyingPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
-  
+
   const [product, setProduct] = useState(null);
   const [supplierOfferings, setSupplierOfferings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +14,7 @@ const BuyingPage = () => {
   const [selectedOffering, setSelectedOffering] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [cardPosition, setCardPosition] = useState({ top: 0, left: 0 });
+  const [cartMessage, setCartMessage] = useState(''); // State for success/error messages
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -52,6 +53,50 @@ const BuyingPage = () => {
     });
     setSelectedOffering(offering);
     setQuantity(1);
+    setCartMessage(''); // Clear previous messages when a new supplier is selected
+  };
+
+  // --- NEW: Function to handle adding items to the cart ---
+  const handleAddToCart = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/login'); // Redirect to login if not authenticated
+      return;
+    }
+
+    if (!selectedOffering) return;
+
+    const payload = {
+      product_id: product.id,
+      supplier_id: selectedOffering.supplier.id,
+      quantity: quantity,
+      price: selectedOffering.price,
+    };
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/cart/add-to-cart/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add item to cart.');
+      }
+      
+      setCartMessage('Item added to cart successfully!');
+      setTimeout(() => {
+        setSelectedOffering(null); // Close the card after a short delay
+      }, 1500);
+
+    } catch (err) {
+      setCartMessage(err.message);
+    }
   };
 
   if (loading) return <div className="loading-container">Loading Details...</div>;
@@ -63,15 +108,15 @@ const BuyingPage = () => {
         <button onClick={() => navigate(-1)} className="back-button">← Back</button>
         <h1>Available Suppliers for {product?.name}</h1>
       </header>
-      
+
       <main className="supplier-grid">
         {supplierOfferings.length > 0 ? (
           supplierOfferings.map(offering => (
             <div key={offering.supplier.id} className="supplier-card">
-              <img 
-                src={offering.supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${offering.supplier.name}`} 
-                alt={offering.supplier.name} 
-                className="supplier-image" 
+              <img
+                src={offering.supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${offering.supplier.name}`}
+                alt={offering.supplier.name}
+                className="supplier-image"
               />
               <div className="supplier-info">
                 <h3 className="supplier-name">{offering.supplier.name}</h3>
@@ -80,14 +125,10 @@ const BuyingPage = () => {
                   <span>•</span>
                   <span>{offering.supplier.delivery_time}</span>
                 </div>
-                
-                {/* --- MODIFIED: Added a dynamic price indicator --- */}
                 <div className="supplier-pricing">
                   <span className="price-amount">₹{parseFloat(offering.price).toFixed(2)}</span>
                   <span className="price-unit">/{offering.unit}</span>
-                  <span className="dynamic-price-indicator" title="Price is adjusted based on current conditions">⚡</span>
                 </div>
-
                 <button
                   className="select-supplier-btn"
                   onClick={(e) => handleSelect(offering, e)}
@@ -135,9 +176,13 @@ const BuyingPage = () => {
           <p style={{ marginTop: '0.5rem' }}>Total: ₹{calculateDiscountedTotal(selectedOffering.price, quantity)}</p>
 
           <div className="button-row">
-            <button className="add-btn">Add to Cart</button>
+            {/* --- MODIFIED: Button now calls the handleAddToCart function --- */}
+            <button className="add-btn" onClick={handleAddToCart}>Add to Cart</button>
             <button className="buy-btn">Buy Now</button>
           </div>
+
+          {/* --- NEW: Display success or error message to the user --- */}
+          {cartMessage && <p className="cart-message">{cartMessage}</p>}
         </div>
       )}
     </div>
