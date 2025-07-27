@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import '../styles/BuyingPage.css'; // We will create this CSS file
+import '../styles/BuyingPage.css';
 
 const BuyingPage = () => {
-  const { productId } = useParams(); // Get the product ID from the URL
+  const { productId } = useParams();
   const navigate = useNavigate();
-  const [suppliers, setSuppliers] = useState([]);
+  
+  const [product, setProduct] = useState(null);
+  // This will now store the combined supplier and pricing info
+  const [supplierOfferings, setSupplierOfferings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchSuppliers = async () => {
+    const fetchProductDetails = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/suppliers/`);
+        const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/`);
         if (!response.ok) {
-          throw new Error('Failed to fetch suppliers');
+          throw new Error('Failed to fetch product details');
         }
         const data = await response.json();
-        setSuppliers(data);
+        setProduct(data);
+        // The supplier data is now in a nested 'suppliers' array
+        setSupplierOfferings(data.suppliers);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -25,34 +30,42 @@ const BuyingPage = () => {
       }
     };
 
-    fetchSuppliers();
-  }, [productId]); // Re-run the effect if the productId changes
+    fetchProductDetails();
+  }, [productId]);
 
-  if (loading) return <div className="loading-container">Loading Suppliers...</div>;
+  if (loading) return <div className="loading-container">Loading Details...</div>;
   if (error) return <div className="error-container">Error: {error}</div>;
 
   return (
     <div className="buying-page-container">
       <header className="buying-page-header">
         <button onClick={() => navigate(-1)} className="back-button">← Back</button>
-        <h1>Available Suppliers</h1>
+        <h1>Available Suppliers for {product?.name}</h1>
       </header>
+      
       <main className="supplier-grid">
-        {suppliers.length > 0 ? (
-          suppliers.map(supplier => (
-            <div key={supplier.id} className="supplier-card">
+        {supplierOfferings.length > 0 ? (
+          supplierOfferings.map(offering => (
+            <div key={offering.supplier.id} className="supplier-card">
               <img 
-                src={supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${supplier.name}`} 
-                alt={supplier.name} 
+                src={offering.supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${offering.supplier.name}`} 
+                alt={offering.supplier.name} 
                 className="supplier-image" 
               />
               <div className="supplier-info">
-                <h3 className="supplier-name">{supplier.name}</h3>
+                <h3 className="supplier-name">{offering.supplier.name}</h3>
                 <div className="supplier-meta">
-                  <span>⭐ {supplier.rating}</span>
+                  <span>⭐ {offering.supplier.rating}</span>
                   <span>•</span>
-                  <span>{supplier.delivery_time}</span>
+                  <span>{offering.supplier.delivery_time}</span>
                 </div>
+                
+                {/* --- MODIFIED: Display the price from the offering --- */}
+                <div className="supplier-pricing">
+                  <span className="price-amount">₹{parseFloat(offering.price).toFixed(2)}</span>
+                  <span className="price-unit">{offering.unit}</span>
+                </div>
+
                 <button className="select-supplier-btn">Select</button>
               </div>
             </div>
