@@ -1,150 +1,166 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaCarrot, FaAppleAlt, FaCheese, FaOilCan, FaStore, FaDrumstickBite, FaLeaf, FaHotdog } from 'react-icons/fa';
-import '../styles/Vendorhomepage.css'; // Make sure to create and link this CSS file
+import '../styles/Vendorhomepage.css'; // Ensure this path is correct
 
-// --- Data for the category navigation ---
-const categories = [
-  { name: 'Vegetables', icon: <FaCarrot color="#4CAF50" size={20} /> },
-  { name: 'Fruits', icon: <FaAppleAlt color="#FF5722" size={20} /> },
-  { name: 'Dairy', icon: <FaCheese color="#FFC107" size={20} /> },
-  { name: 'Oils', icon: <FaOilCan color="#FF9800" size={20} /> },
-  { name: 'Groceries', icon: <FaStore color="#3F51B5" size={20} /> },
-  { name: 'Meat', icon: <FaDrumstickBite color="#E91E63" size={20} /> },
-  { name: 'Ready-to-Use', icon: <FaLeaf color="#009688" size={20} /> },
-  { name: 'Processed Foods', icon: <FaHotdog color="#9C27B0" size={20} /> },
-];
-
-const productData = {
-  Vegetables: Array.from({ length: 15 }, (_, i) => ({
-    id: i + 1,
-    name: `Vegetable ${i + 1}`,
-    image: `https://placehold.co/200x200/e2f5e8/333?text=Veg+${i + 1}`,
-  })),
-  Fruits: Array.from({ length: 15 }, (_, i) => ({
-    id: i + 20,
-    name: `Fruit ${i + 1}`,
-    image: `https://placehold.co/200x200/ffeded/333?text=Fruit+${i + 1}`,
-  })),
-  Dairy: Array.from({ length: 15 }, (_, i) => ({
-    id: i + 40,
-    name: `Dairy ${i + 1}`,
-    image: `https://placehold.co/200x200/fff3e2/333?text=Dairy+${i + 1}`,
-  })),
-  Oils: Array.from({ length: 15 }, (_, i) => ({
-    id: i + 60,
-    name: `Oil ${i + 1}`,
-    image: `https://placehold.co/200x200/fdfde7/333?text=Oil+${i + 1}`,
-  })),
-  Groceries: Array.from({ length: 15 }, (_, i) => ({
-    id: i + 80,
-    name: `Grocery ${i + 1}`,
-    image: `https://placehold.co/200x200/f0fff4/333?text=Grocery+${i + 1}`,
-  })),
-  Meat: Array.from({ length: 15 }, (_, i) => ({
-    id: i + 100,
-    name: `Meat ${i + 1}`,
-    image: `https://placehold.co/200x200/ffeef0/333?text=Meat+${i + 1}`,
-  })),
-   "Ready-to-Use": Array.from({ length: 15 }, (_, i) => ({
-    id: i + 120,
-    name: `Ready Item ${i + 1}`,
-    image: `https://placehold.co/200x200/e0f7fa/333?text=Ready+${i + 1}`,
-  })),
-
-  "Processed Foods": Array.from({ length: 15 }, (_, i) => ({
-    id: i + 140,
-    name: `Processed Food ${i + 1}`,
-    image: `https://placehold.co/200x200/fce4ec/333?text=Processed+${i + 1}`,
-  }))
+// Helper to map category names to icons
+const categoryIcons = {
+    'Vegetables': <FaCarrot color="#4CAF50" size={20} />,
+    'Fruits': <FaAppleAlt color="#FF5722" size={20} />,
+    'Dairy': <FaCheese color="#FFC107" size={20} />,
+    'Oils': <FaOilCan color="#FF9800" size={20} />,
+    'Groceries': <FaStore color="#3F51B5" size={20} />,
+    'Meat': <FaDrumstickBite color="#E91E63" size={20} />,
+    'Ready-to-Use': <FaLeaf color="#009688" size={20} />,
+    'Processed Foods': <FaHotdog color="#9C27B0" size={20} />,
 };
-const dealsOfTheDay = [
-  {
-    name: "Fresh Tomatoes",
-    image: "https://placehold.co/150x150/e2f5e8/333?text=Tomato",
-    offer: "30% OFF",
-  },
-  {
-    name: "Almond Oil",
-    image: "https://placehold.co/150x150/fef4e7/333?text=Oil",
-    offer: "25% OFF",
-  },
-  {
-    name: "Paneer Block",
-    image: "https://placehold.co/150x150/fff3e2/333?text=Paneer",
-    offer: "15% OFF",
-  },
-  {
-    name: "Coconut",
-    image: "https://placehold.co/150x150/def7e8/333?text=Coconut",
-    offer: "35% OFF",
-  },
-  {
-    name: "Ready Mix Poha",
-    image: "https://placehold.co/150x150/fce4ec/333?text=Poha+Mix",
-    offer: "20% OFF",
-  },
-];
-
 
 const Vendorhomepage = () => {
-    const [activeCategory, setActiveCategory] = useState('Vegetables');
+    const [categories, setCategories] = useState([]);
+    const [products, setProducts] = useState({});
+    const [deals, setDeals] = useState([]);
+    const [activeCategory, setActiveCategory] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+
     const navRef = useRef(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                const [categoryResponse, dealsResponse] = await Promise.all([
+                    fetch('http://127.0.0.1:8000/api/categories/'),
+                    fetch('http://127.0.0.1:8000/api/deals/')
+                ]);
+
+                if (!categoryResponse.ok || !dealsResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const categoryData = await categoryResponse.json();
+                const dealsData = await dealsResponse.json();
+                
+                const categoryList = categoryData.map(cat => ({ name: cat.name, icon: categoryIcons[cat.name] || <FaLeaf size={20} /> }));
+                const productMap = categoryData.reduce((acc, cat) => {
+                    acc[cat.name] = cat.products;
+                    return acc;
+                }, {});
+
+                setCategories(categoryList);
+                setProducts(productMap);
+                setDeals(dealsData);
+                
+                if (categoryList.length > 0) {
+                    setActiveCategory(categoryList[0].name);
+                }
+
+            } catch (error) {
+                setError(error.message);
+                console.error("Failed to fetch data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAllData();
+    }, []);
 
     const scroll = (scrollOffset) => {
         if (navRef.current) {
             navRef.current.scrollLeft += scrollOffset;
         }
     };
-     const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedCity, setSelectedCity] = useState("Select Location");
-  const locations = ["Surat", "Ahmedabad", "Rajkot", "Vadodara", "Gandhinagar"];
 
-  const toggleDropdown = () => setShowDropdown(!showDropdown);
-  const selectCity = (city) => {
-    setSelectedCity(city);
-    setShowDropdown(false);
-  };
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedCity, setSelectedCity] = useState("Select Location");
+    const locations = ["Surat", "Ahmedabad", "Rajkot", "Vadodara", "Gandhinagar"];
+
+    const toggleDropdown = () => setShowDropdown(!showDropdown);
+    const selectCity = (city) => {
+        setSelectedCity(city);
+        setShowDropdown(false);
+    };
+
+    const handleLogout = async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        try {
+            await fetch('http://127.0.0.1:8000/api/users/logout/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (error) {
+            console.error("Logout failed on server:", error);
+        } finally {
+            localStorage.removeItem('authToken');
+            navigate('/login');
+        }
+    };
+
+    const getFilteredResults = () => {
+        if (!searchQuery) {
+            return { [activeCategory]: products[activeCategory] || [] };
+        }
+        return Object.entries(products).reduce((acc, [category, productList]) => {
+            const matchingProducts = productList.filter(product =>
+                product.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            if (matchingProducts.length > 0) {
+                acc[category] = matchingProducts;
+            }
+            return acc;
+        }, {});
+    };
+
+    const filteredResults = getFilteredResults();
+    const isSearching = searchQuery.length > 0;
 
     return (
-         <div className="vendor-page-container">
+        <div className="vendor-page-container">
             <header className="vendor-header">
-               <div className="top-bar">
-  <h1 className="logo">VendorVerse</h1>
-
-  <div className="right-header">
-    <div className="location-selector-wrapper">
-  <div className="location-selector" onClick={toggleDropdown}>
-    <span>{selectedCity}</span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-  </div>
-
-  {showDropdown && (
-    <ul className="location-dropdown">
-      {locations.map((city) => (
-        <li key={city} onClick={() => selectCity(city)}>
-          {city}
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
-
-
-    <div className="search-bar">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="text" placeholder='Search for "banana"' />
-    </div>
-
-    <div className="user-action">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Logout</span>
-    </div>
-  </div>
-</div>
-
+                <div className="top-bar">
+                    <h1 className="logo">VendorVerse</h1>
+                    <div className="right-header">
+                        <div className="location-selector-wrapper">
+                            <div className="location-selector" onClick={toggleDropdown}>
+                                <span>{selectedCity}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                            {showDropdown && (
+                                <ul className="location-dropdown">
+                                    {locations.map((city) => (
+                                        <li key={city} onClick={() => selectCity(city)}>{city}</li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                        <div className="search-bar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <input 
+                                type="text" 
+                                placeholder='Search for products...'
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <div className="user-action" onClick={handleLogout}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span>Logout</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div className="category-nav-container">
-                     <button className="scroll-arrow left" onClick={() => scroll(-250)}>&lt;</button>
+                    <button className="scroll-arrow left" onClick={() => scroll(-250)}>&lt;</button>
                     <nav className="category-nav" ref={navRef}>
                         <ul>
                             {categories.map((category) => (
@@ -159,39 +175,78 @@ const Vendorhomepage = () => {
                             ))}
                         </ul>
                     </nav>
-                     <button className="scroll-arrow right" onClick={() => scroll(250)}>&gt;</button>
+                    <button className="scroll-arrow right" onClick={() => scroll(250)}>&gt;</button>
                 </div>
             </header>
-            <section className="deals-section">
-  <h2 className="deals-title">🔥 Deals of the Day</h2>
-  <div className="deals-container">
-    {dealsOfTheDay.map((deal, index) => (
-      <div className="deal-card" key={index}>
-        <img src={deal.image} alt={deal.name} className="deal-image" />
-        <p className="deal-name">{deal.name}</p>
-        <p className="deal-offer">{deal.offer}</p>
-        <button className="deal-button">Buy Now</button>
-      </div>
-    ))}
-  </div>
-</section>
+            
+            {!isSearching && (
+                <section className="deals-section">
+                    <h2 className="deals-title">🔥 Deals of the Day</h2>
+                    <div className="deals-container">
+                        {deals.map((deal) => (
+                            <div className="deal-card" key={deal.id}>
+                                <img src={deal.image} alt={deal.name} className="deal-image" />
+                                <p className="deal-name">{deal.name}</p>
+                                {deal.offer && <p className="deal-offer">{deal.offer}</p>}
+                                <button className="deal-button" onClick={() => navigate(`/buy/${deal.id}`)}>Buy Now</button>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             <main className="product-section">
-  <h2 className="section-title">{activeCategory}</h2>
-  <div className="product-grid">
-    {productData[activeCategory]?.map((product) => (
-      <div key={product.id} className="product-card">
-        <img src={product.image} alt={product.name} className="product-img" />
-        <div className="product-info">
-          <h3>{product.name}</h3>
-          <button className="add-btn">BUY</button>
-
-        </div>
-      </div>
-    ))}
-  </div>
-</main>
-
+                {loading && <p>Loading products...</p>}
+                {error && <p>Error: {error}</p>}
+                {!loading && !error && (
+                    <>
+                        {isSearching ? (
+                            <>
+                                <h2 className="section-title">Search Results for "{searchQuery}"</h2>
+                                {Object.keys(filteredResults).length > 0 ? (
+                                    Object.entries(filteredResults).map(([category, products]) => (
+                                        <div key={category}>
+                                            <h3 className="category-subtitle">{category}</h3>
+                                            <div className="product-grid">
+                                                {products.map(product => (
+                                                    <div key={product.id} className="product-card">
+                                                        <img src={product.image} alt={product.name} className="product-img" />
+                                                        <div className="product-info">
+                                                            <h3>{product.name}</h3>
+                                                            <button className="add-btn" onClick={() => navigate(`/buy/${product.id}`)}>BUY</button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="no-products-message">No products found for "{searchQuery}".</p>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="section-title">{activeCategory}</h2>
+                                <div className="product-grid">
+                                    {filteredResults[activeCategory]?.length > 0 ? (
+                                        filteredResults[activeCategory].map((product) => (
+                                            <div key={product.id} className="product-card">
+                                                <img src={product.image} alt={product.name} className="product-img" />
+                                                <div className="product-info">
+                                                    <h3>{product.name}</h3>
+                                                    <button className="add-btn" onClick={() => navigate(`/buy/${product.id}`)}>BUY</button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="no-products-message">No products currently available in {activeCategory}.</p>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </>
+                )}
+            </main>
         </div>
     );
 };
