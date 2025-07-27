@@ -12,12 +12,16 @@ const BuyingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [cardPosition, setCardPosition] = useState({ top: 0, left: 0 });
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/`);
+        const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/suppliers/`);
         if (!response.ok) {
-          throw new Error('Failed to fetch product details');
+          throw new Error('Failed to fetch suppliers');
         }
         const data = await response.json();
         setProduct(data);
@@ -30,8 +34,8 @@ const BuyingPage = () => {
       }
     };
 
-    fetchProductDetails();
-  }, [productId]);
+    fetchSuppliers();
+  }, [productId]); // Re-run the effect if the productId changes
 
   if (loading) return <div className="loading-container">Loading Details...</div>;
   if (error) return <div className="error-container">Error: {error}</div>;
@@ -42,7 +46,6 @@ const BuyingPage = () => {
         <button onClick={() => navigate(-1)} className="back-button">← Back</button>
         <h1>Available Suppliers for {product?.name}</h1>
       </header>
-      
       <main className="supplier-grid">
         {supplierOfferings.length > 0 ? (
           supplierOfferings.map(offering => (
@@ -65,7 +68,6 @@ const BuyingPage = () => {
                   <span className="price-amount">₹{parseFloat(offering.price).toFixed(2)}</span>
                   <span className="price-unit">{offering.unit}</span>
                 </div>
-
                 <button className="select-supplier-btn">Select</button>
               </div>
             </div>
@@ -74,8 +76,45 @@ const BuyingPage = () => {
           <p>No suppliers found for this product.</p>
         )}
       </main>
+
+      {selectedSupplier && (
+        <div 
+          className="floating-card"
+          style={{
+            top: `${cardPosition.top}px`,
+            left: `${cardPosition.left}px`,
+            transform: 'translateX(-50%)'
+          }}
+        >
+          <button className="close-btn" onClick={() => setSelectedSupplier(null)}>✕</button>
+
+          <h3>{selectedSupplier.name}</h3>
+          <p className="address">📍 {selectedSupplier.address || "Gandhinagar, Gujarat"}</p>
+          <p className="base-price">Base Price: ₹{selectedSupplier.base_price || 50}/kg</p>
+
+          <div className="quantity-block">
+            <label>Quantity (kg):</label>
+            <input 
+              type="number"
+              min={1}
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+            />
+          </div>
+
+          <p className="price-summary">
+            Total: ₹{calculatePrice(selectedSupplier.base_price || 50, quantity)}
+          </p>
+
+          <div className="button-actions">
+            <button className="add-cart">Add to Cart</button>
+            <button className="buy-now">Buy Now</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default BuyingPage;
+

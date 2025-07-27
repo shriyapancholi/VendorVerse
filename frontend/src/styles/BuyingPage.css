@@ -122,3 +122,80 @@
     font-size: 1.25rem;
     color: #6b7280;
 }
+.floating-card {
+  position: absolute;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  padding: 1.5rem;
+  width: 300px;
+  z-index: 999;
+  animation: floatUp 0.2s ease-out;
+}
+
+@keyframes floatUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.floating-card .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.floating-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.floating-card .address,
+.base-price,
+.price-summary {
+  font-size: 0.95rem;
+  margin: 0.25rem 0;
+  color: #374151;
+}
+
+.quantity-block {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.quantity-block input {
+  width: 60px;
+  padding: 5px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.button-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.2rem;
+}
+
+.button-actions button {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.add-cart {
+  background-color: #facc15;
+  color: black;
+}
+
+.buy-now {
+  background-color: #fb923c;
+  color: white;
+}
