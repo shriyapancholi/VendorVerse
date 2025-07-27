@@ -56,8 +56,47 @@ const BuyingPage = () => {
     setCartMessage('');
   };
 
+  // --- MODIFIED: Added complete cart logic ---
   const handleAddToCart = async () => {
-    // ... (handleAddToCart logic remains the same)
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/login'); // Redirect if not logged in
+      return;
+    }
+
+    if (!selectedOffering) return;
+
+    const payload = {
+      product_id: product.id,
+      supplier_id: selectedOffering.supplier.id,
+      quantity: quantity,
+      price: selectedOffering.price,
+    };
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/cart/add-to-cart/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add item to cart.');
+      }
+      
+      setCartMessage('Item added to cart successfully!');
+      setTimeout(() => {
+        setSelectedOffering(null); // Close the card after a delay
+      }, 1500);
+
+    } catch (err) {
+      setCartMessage(err.message);
+    }
   };
 
   if (loading) return <div className="loading-container">Loading Details...</div>;
@@ -85,7 +124,6 @@ const BuyingPage = () => {
                   <span>⭐ {offering.supplier.rating}</span>
                   <span>•</span>
                   <span>{offering.supplier.delivery_time}</span>
-                  {/* --- NEW: Contact Button --- */}
                   {offering.supplier.phone_number && (
                     <a href={`tel:${offering.supplier.phone_number}`} className="contact-supplier-btn">
                       Contact
