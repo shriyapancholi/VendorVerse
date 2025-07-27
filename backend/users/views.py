@@ -4,68 +4,62 @@ from rest_framework import status, permissions # type: ignore
 from rest_framework.response import Response # type: ignore
 from rest_framework.views import APIView # type: ignore
 from rest_framework.authtoken.models import Token # type: ignore
+from django.contrib.auth.models import Group # type: ignore
 
 User = get_user_model()
 
 class SignupView(APIView):
-    # This view must have a 'post' method to handle POST requests.
     def post(self, request):
         username = request.data.get('email')
         email = request.data.get('email')
         password = request.data.get('password')
         full_name = request.data.get('fullName', '')
+        user_type = request.data.get('userType') # 'vendor' or 'supplier'
 
-        if not username or not password or not email:
-            return Response(
-                {'error': 'Please provide email and password'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if not all([username, email, password, user_type]):
+            return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         if User.objects.filter(username=username).exists():
-            return Response(
-                {'error': 'A user with this email already exists.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'error': 'A user with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.create_user(username=username, email=email, password=password, first_name=full_name)
-        token, _ = Token.objects.get_or_create(user=user)
+        
+        # Add the user to the correct group based on user_type
+        try:
+            if user_type == 'supplier':
+                group = Group.objects.get(name='Supplier')
+                user.groups.add(group)
+            else: # Default to Vendor
+                group = Group.objects.get(name='Vendor')
+                user.groups.add(group)
+        except Group.DoesNotExist:
+            # This is a fallback in case the groups haven't been created in the admin yet
+            pass
 
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'email': user.email
-        }, status=status.HTTP_201_CREATED)
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
 
 class LoginView(APIView):
-    # This view must also have a 'post' method.
-    # The 405 error occurs if this method is misspelled (e.g., 'psot')
-    # or incorrectly indented.
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        if not email or not password:
-            return Response(
-                {'error': 'Please provide both email and password'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         user = authenticate(username=email, password=password)
-
         if not user:
-            return Response(
-                {'error': 'Invalid Credentials'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+            return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
             
         token, _ = Token.objects.get_or_create(user=user)
+        
+        # Determine the user's role
+        user_type = 'vendor' # Default role
+        if user.groups.filter(name='Supplier').exists():
+            user_type = 'supplier'
 
         return Response({
             'token': token.key,
-            'user_id': user.pk,
-            'email': user.email
+            'user_type': user_type # Include the user's role in the response
         })
-
 class LogoutView(APIView):
     """
     API view for user logout. Requires token authentication.
