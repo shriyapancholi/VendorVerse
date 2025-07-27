@@ -9,6 +9,8 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import BuyingPage from './pages/BuyingPage';
 import CartPage from './pages/CartPage'; // Import the CartPage
 import './App.css';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 
 // This new component will contain all the routing logic.
 // This is a clean pattern that ensures useNavigate works correctly.
@@ -47,6 +49,8 @@ function AppRoutes() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/dashboard/review" element={<ReviewPage />} />
       <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+       <Route path="/order-success" element={<OrderSuccessPage />} />
     </Routes>
   );
 }

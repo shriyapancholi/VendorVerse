@@ -37,7 +37,6 @@ const CartPage = () => {
     fetchCartDetails();
   }, [navigate]);
 
-  // --- NEW: Function to handle removing an item from the cart ---
   const handleRemoveItem = async (itemId) => {
     const token = localStorage.getItem('authToken');
     if (!token) return;
@@ -54,14 +53,12 @@ const CartPage = () => {
         throw new Error('Failed to remove item from cart.');
       }
 
-      // If successful, update the state to remove the item from the UI instantly
       setCart(prevCart => ({
         ...prevCart,
         items: prevCart.items.filter(item => item.id !== itemId)
       }));
 
     } catch (err) {
-      // You can set an error state here to show a message to the user
       console.error(err.message);
     }
   };
@@ -93,7 +90,6 @@ const CartPage = () => {
                 </div>
                 <div className="item-actions">
                   <span className="item-price">₹{(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
-                  {/* --- MODIFIED: Added Remove button --- */}
                   <button onClick={() => handleRemoveItem(item.id)} className="remove-item-btn">
                     Remove
                   </button>
@@ -120,7 +116,10 @@ const CartPage = () => {
               <span>Total</span>
               <span>₹{(calculateSubtotal() + 20).toFixed(2)}</span>
             </div>
-            <button className="checkout-btn">Proceed to Checkout</button>
+            {/* --- MODIFIED: This button now navigates to the checkout page --- */}
+            <button className="checkout-btn" onClick={() => navigate('/checkout')}>
+              Proceed to Checkout
+            </button>
           </div>
         )}
       </main>
