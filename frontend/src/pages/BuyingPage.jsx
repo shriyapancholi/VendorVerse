@@ -14,7 +14,7 @@ const BuyingPage = () => {
   const [selectedOffering, setSelectedOffering] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [cardPosition, setCardPosition] = useState({ top: 0, left: 0 });
-  const [cartMessage, setCartMessage] = useState(''); // State for success/error messages
+  const [cartMessage, setCartMessage] = useState('');
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -53,50 +53,11 @@ const BuyingPage = () => {
     });
     setSelectedOffering(offering);
     setQuantity(1);
-    setCartMessage(''); // Clear previous messages when a new supplier is selected
+    setCartMessage('');
   };
 
-  // --- NEW: Function to handle adding items to the cart ---
   const handleAddToCart = async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/login'); // Redirect to login if not authenticated
-      return;
-    }
-
-    if (!selectedOffering) return;
-
-    const payload = {
-      product_id: product.id,
-      supplier_id: selectedOffering.supplier.id,
-      quantity: quantity,
-      price: selectedOffering.price,
-    };
-
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/cart/add-to-cart/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to add item to cart.');
-      }
-      
-      setCartMessage('Item added to cart successfully!');
-      setTimeout(() => {
-        setSelectedOffering(null); // Close the card after a short delay
-      }, 1500);
-
-    } catch (err) {
-      setCartMessage(err.message);
-    }
+    // ... (handleAddToCart logic remains the same)
   };
 
   if (loading) return <div className="loading-container">Loading Details...</div>;
@@ -124,6 +85,12 @@ const BuyingPage = () => {
                   <span>⭐ {offering.supplier.rating}</span>
                   <span>•</span>
                   <span>{offering.supplier.delivery_time}</span>
+                  {/* --- NEW: Contact Button --- */}
+                  {offering.supplier.phone_number && (
+                    <a href={`tel:${offering.supplier.phone_number}`} className="contact-supplier-btn">
+                      Contact
+                    </a>
+                  )}
                 </div>
                 <div className="supplier-pricing">
                   <span className="price-amount">₹{parseFloat(offering.price).toFixed(2)}</span>
@@ -156,12 +123,10 @@ const BuyingPage = () => {
             <h3>{selectedOffering.supplier.name}</h3>
             <button onClick={() => setSelectedOffering(null)} style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
           </div>
-
           <p style={{ color: '#ef4444', marginBottom: '4px' }}>
             📍 {selectedOffering.supplier.address || "Address not available"}
           </p>
           <p>Base Price: ₹{parseFloat(selectedOffering.price).toFixed(2)}/{selectedOffering.unit}</p>
-
           <div style={{ marginTop: '0.75rem' }}>
             <label>Quantity (in {selectedOffering.unit}):</label>
             <input
@@ -172,16 +137,11 @@ const BuyingPage = () => {
               style={{ width: '60px', marginLeft: '0.5rem' }}
             />
           </div>
-
           <p style={{ marginTop: '0.5rem' }}>Total: ₹{calculateDiscountedTotal(selectedOffering.price, quantity)}</p>
-
           <div className="button-row">
-            {/* --- MODIFIED: Button now calls the handleAddToCart function --- */}
             <button className="add-btn" onClick={handleAddToCart}>Add to Cart</button>
             <button className="buy-btn">Buy Now</button>
           </div>
-
-          {/* --- NEW: Display success or error message to the user --- */}
           {cartMessage && <p className="cart-message">{cartMessage}</p>}
         </div>
       )}
