@@ -6,4 +6,5 @@ urlpatterns = [
     # Add this line to include your new authentication endpoints
     path('api/users/', include('users.urls')),
     # ... any other urls you already have
+    path('api/', include('products.urls')), # Add this line
 ]   

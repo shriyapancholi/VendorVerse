@@ -1,16 +1,14 @@
-from django.contrib.auth import get_user_model, authenticate # type: ignore
-from django.utils.decorators import method_decorator # type: ignore
-from django.views.decorators.csrf import csrf_exempt # type: ignore
 
-from rest_framework import status # type: ignore
+from django.contrib.auth import get_user_model, authenticate # type: ignore
+from rest_framework import status, permissions # type: ignore
 from rest_framework.response import Response # type: ignore
 from rest_framework.views import APIView # type: ignore
 from rest_framework.authtoken.models import Token # type: ignore
 
 User = get_user_model()
 
-@method_decorator(csrf_exempt, name='dispatch')
 class SignupView(APIView):
+    # This view must have a 'post' method to handle POST requests.
     def post(self, request):
         username = request.data.get('email')
         email = request.data.get('email')
@@ -38,8 +36,10 @@ class SignupView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
+    # This view must also have a 'post' method.
+    # The 405 error occurs if this method is misspelled (e.g., 'psot')
+    # or incorrectly indented.
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -65,3 +65,23 @@ class LoginView(APIView):
             'user_id': user.pk,
             'email': user.email
         })
+
+class LogoutView(APIView):
+    """
+    API view for user logout. Requires token authentication.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            # Simply delete the token to force a login
+            request.user.auth_token.delete()
+            return Response(
+                {"message": "Successfully logged out."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
