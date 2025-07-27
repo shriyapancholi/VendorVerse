@@ -13,114 +13,56 @@ export default function SupplierDashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [inventory, setInventory] = useState([]);
 
-  const handleAddItem = (item) => {
-    const updated = [...inventory, item];
-    setInventory(updated);
-    localStorage.setItem("sharedInventory", JSON.stringify(updated)); // Save to localStorage    
-    setShowAddModal(false);
+  const handleAddItem = async (item) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/inventory/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(item),
+      });
+
+      if (!response.ok) throw new Error("Failed to add item");
+
+      const newItem = await response.json();
+      setInventory(prev => [...prev, newItem]);
+      setShowAddModal(false);
+    } catch (error) {
+      console.error("Error adding item:", error);
+    }
   };
-  const handleDeleteItem = (id) => {
-    const updated = inventory.filter(item => item.id !== id);
-    setInventory(updated);
-    localStorage.setItem("sharedInventory", JSON.stringify(updated));
+  
+  const handleDeleteItem = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/inventory/${id}/`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete item");
+
+      setInventory(prev => prev.filter(item => item.id !== id));
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
   };
+  
 
   useEffect(() => {
-    const savedInventory = localStorage.getItem("sharedInventory");
+    const fetchInventory = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/inventory/"); // replace with your backend API URL
+        const data = await response.json();
 
-    if (savedInventory) {
-      // Load previously saved inventory (added by supplier or default)
-      setInventory(JSON.parse(savedInventory));
-    } else {
-      // If nothing in localStorage, use your default dummy items
-      const dummyItems = [
-        {
-          id: 1,
-          name: "Fresh Tomatoes",
-          quantity: "5 kg",
-          quality: "Grade A - Fresh",
-          expiry: "3 days",
-          price: "₹40/kg",
-          category: "Vegetables",
-          isLowStock: false,
-        },
-        {
-          id: 2,
-          name: "Full Cream Milk",
-          quantity: "10 L",
-          quality: "Amul - Fresh",
-          expiry: "2 days",
-          price: "₹60/L",
-          category: "Dairy",
-          isLowStock: false,
-        },
-        {
-          id: 3,
-          name: "Green Chilies",
-          quantity: "1 kg",
-          quality: "Spicy and fresh",
-          expiry: "2 days",
-          price: "₹70/kg",
-          category: "Vegetables",
-          isLowStock: true,
-        },
-        {
-          id: 4,
-          name: "Masala Dosa Batter",
-          quantity: "3 kg",
-          quality: "Home-made, fermented",
-          expiry: "1 day",
-          price: "₹90/kg",
-          category: "Batter",
-          isLowStock: false,
-        },
-        {
-          id: 5,
-          name: "Cooking Oil",
-          quantity: "15 L",
-          quality: "Refined Sunflower Oil",
-          expiry: "10 days",
-          price: "₹120/L",
-          category: "Oils",
-          isLowStock: false,
-        },
-        {
-          id: 6,
-          name: "Onions",
-          quantity: "6 kg",
-          quality: "Pink, fresh batch",
-          expiry: "4 days",
-          price: "₹25/kg",
-          category: "Vegetables",
-          isLowStock: true,
-        },
-        {
-          id: 7,
-          name: "Pav Buns",
-          quantity: "50 pcs",
-          quality: "Fresh bakery stock",
-          expiry: "1 day",
-          price: "₹3/piece",
-          category: "Bakery",
-          isLowStock: false,
-        },
-        {
-          id: 8,
-          name: "Sweet Corn",
-          quantity: "2 kg",
-          quality: "Boiled and packed",
-          expiry: "2 days",
-          price: "₹90/kg",
-          category: "Ready-to-Use",
-          isLowStock: false,
-        }
-      ];
+        setInventory(data);
+      } catch (error) {
+        console.error("Error fetching inventory:", error);
+      }
+    };
 
-      // Save to state and localStorage so vendor can use it
-      setInventory(dummyItems);
-      localStorage.setItem("sharedInventory", JSON.stringify(dummyItems));
-    }
+    fetchInventory();
   }, []);
+  
 
   return (
     <div className="min-h-screen p-6 md:p-10 bg-gradient-to-br from-blue-50 to-purple-100">
