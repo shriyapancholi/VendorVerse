@@ -12,7 +12,7 @@ export default function ReviewPage() {
         <h2 className="text-3xl font-bold text-indigo-700">Ratings & Reviews by Vendors</h2>
         <button
           onClick={() => navigate("/dashboard")}
-          className="text-sm bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold py-2 px-4 rounded-md shadow transition"
+          className="back-button"
         >
           ← Back to Dashboard
         </button>
