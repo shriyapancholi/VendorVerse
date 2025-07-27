@@ -31,6 +31,7 @@ WEATHER_API_KEY = "8df74b543bf3496eaf4104555252707"
 # Application definition
 
 INSTALLED_APPS = [
+    'orders.apps.OrdersConfig',
     'cart.apps.CartConfig', 
     'suppliers.apps.SuppliersConfig',
     'products.apps.ProductsConfig',
