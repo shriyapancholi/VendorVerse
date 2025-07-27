@@ -3,8 +3,9 @@ from rest_framework.views import APIView  # type: ignore # Import APIView here
 from rest_framework.response import Response # type: ignore
 from rest_framework import status # type: ignore
 from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from .serializers import CategorySerializer, ProductDetailSerializer, ProductSerializer
 from suppliers.serializers import SupplierSerializer
+
 
 class CategoryProductListView(generics.ListAPIView):
     """
@@ -32,3 +33,12 @@ class ProductSuppliersView(APIView):
             return Response(serializer.data)
         except Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class ProductDetailView(generics.RetrieveAPIView):
+    """
+    API view to retrieve all details for a single product, including its suppliers.
+    This is the view that corresponds to the URL pattern you selected.
+    """
+    queryset = Product.objects.all()
+    serializer_class = ProductDetailSerializer
+    lookup_field = 'pk' # 'pk' refers to the product's primary key (ID)

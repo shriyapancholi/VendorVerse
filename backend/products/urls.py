@@ -4,9 +4,11 @@ from django.urls import path # type: ignore
 from .views import CategoryProductListView
 from .views import DealOfTheDayListView
 from .views import ProductSuppliersView
+from .views import ProductDetailView
 
 urlpatterns = [
     path('categories/', CategoryProductListView.as_view(), name='category-product-list'),
      path('deals/', DealOfTheDayListView.as_view(), name='deal-of-the-day-list'), # type: ignore
      path('products/<int:product_id>/suppliers/', ProductSuppliersView.as_view(), name='product-suppliers'),
+     path('products/<int:pk>/', ProductDetailView.as_view(), name='product-detail')
 ]
