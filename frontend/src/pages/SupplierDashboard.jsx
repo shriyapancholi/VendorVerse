@@ -14,94 +14,112 @@ export default function SupplierDashboard() {
   const [inventory, setInventory] = useState([]);
 
   const handleAddItem = (item) => {
-    setInventory((prev) => [...prev, item]);
+    const updated = [...inventory, item];
+    setInventory(updated);
+    localStorage.setItem("sharedInventory", JSON.stringify(updated)); // Save to localStorage    
     setShowAddModal(false);
+  };
+  const handleDeleteItem = (id) => {
+    const updated = inventory.filter(item => item.id !== id);
+    setInventory(updated);
+    localStorage.setItem("sharedInventory", JSON.stringify(updated));
   };
 
   useEffect(() => {
-    const dummyItems = [
-      {
-        id: 1,
-        name: "Fresh Tomatoes",
-        quantity: "5 kg",
-        quality: "Grade A - Fresh",
-        expiry: "3 days",
-        price: "₹40/kg",
-        category: "Vegetables",
-        isLowStock: false,
-      },
-      {
-        id: 2,
-        name: "Full Cream Milk",
-        quantity: "10 L",
-        quality: "Amul - Fresh",
-        expiry: "2 days",
-        price: "₹60/L",
-        category: "Dairy",
-        isLowStock: false,
-      },
-      {
-        id: 3,
-        name: "Green Chilies",
-        quantity: "1 kg",
-        quality: "Spicy and fresh",
-        expiry: "2 days",
-        price: "₹70/kg",
-        category: "Vegetables",
-        isLowStock: true,
-      },
-      {
-        id: 4,
-        name: "Masala Dosa Batter",
-        quantity: "3 kg",
-        quality: "Home-made, fermented",
-        expiry: "1 day",
-        price: "₹90/kg",
-        category: "Batter",
-        isLowStock: false,
-      },
-      {
-        id: 5,
-        name: "Cooking Oil",
-        quantity: "15 L",
-        quality: "Refined Sunflower Oil",
-        expiry: "10 days",
-        price: "₹120/L",
-        category: "Oils",
-        isLowStock: false,
-      },
-      {
-        id: 6,
-        name: "Onions",
-        quantity: "6 kg",
-        quality: "Pink, fresh batch",
-        expiry: "4 days",
-        price: "₹25/kg",
-        category: "Vegetables",
-        isLowStock: true,
-      },
-      {
-        id: 7,
-        name: "Pav Buns",
-        quantity: "50 pcs",
-        quality: "Fresh bakery stock",
-        expiry: "1 day",
-        price: "₹3/piece",
-        category: "Bakery",
-        isLowStock: false,
-      },
-      {
-        id: 8,
-        name: "Sweet Corn",
-        quantity: "2 kg",
-        quality: "Boiled and packed",
-        expiry: "2 days",
-        price: "₹90/kg",
-        category: "Ready-to-Serve",
-        isLowStock: false,
-      }
-    ];
-    setInventory(dummyItems);
+    const savedInventory = localStorage.getItem("sharedInventory");
+
+    if (savedInventory) {
+      // Load previously saved inventory (added by supplier or default)
+      setInventory(JSON.parse(savedInventory));
+    } else {
+      // If nothing in localStorage, use your default dummy items
+      const dummyItems = [
+        {
+          id: 1,
+          name: "Fresh Tomatoes",
+          quantity: "5 kg",
+          quality: "Grade A - Fresh",
+          expiry: "3 days",
+          price: "₹40/kg",
+          category: "Vegetables",
+          isLowStock: false,
+        },
+        {
+          id: 2,
+          name: "Full Cream Milk",
+          quantity: "10 L",
+          quality: "Amul - Fresh",
+          expiry: "2 days",
+          price: "₹60/L",
+          category: "Dairy",
+          isLowStock: false,
+        },
+        {
+          id: 3,
+          name: "Green Chilies",
+          quantity: "1 kg",
+          quality: "Spicy and fresh",
+          expiry: "2 days",
+          price: "₹70/kg",
+          category: "Vegetables",
+          isLowStock: true,
+        },
+        {
+          id: 4,
+          name: "Masala Dosa Batter",
+          quantity: "3 kg",
+          quality: "Home-made, fermented",
+          expiry: "1 day",
+          price: "₹90/kg",
+          category: "Batter",
+          isLowStock: false,
+        },
+        {
+          id: 5,
+          name: "Cooking Oil",
+          quantity: "15 L",
+          quality: "Refined Sunflower Oil",
+          expiry: "10 days",
+          price: "₹120/L",
+          category: "Oils",
+          isLowStock: false,
+        },
+        {
+          id: 6,
+          name: "Onions",
+          quantity: "6 kg",
+          quality: "Pink, fresh batch",
+          expiry: "4 days",
+          price: "₹25/kg",
+          category: "Vegetables",
+          isLowStock: true,
+        },
+        {
+          id: 7,
+          name: "Pav Buns",
+          quantity: "50 pcs",
+          quality: "Fresh bakery stock",
+          expiry: "1 day",
+          price: "₹3/piece",
+          category: "Bakery",
+          isLowStock: false,
+        },
+        {
+          id: 8,
+          name: "Sweet Corn",
+          quantity: "2 kg",
+          quality: "Boiled and packed",
+          expiry: "2 days",
+          price: "₹90/kg",
+          category: "Ready-to-Use",
+          isLowStock: false,
+        }
+      ];
+
+      // Save to state and localStorage so vendor can use it
+      setInventory(dummyItems);
+      localStorage.setItem("sharedInventory", JSON.stringify(dummyItems));
+    }
   }, []);
 
   return (
@@ -138,7 +156,12 @@ export default function SupplierDashboard() {
             </div>
           </div>
 
-          <InventoryList items={inventory} categoryFilter={selectedCategory} />
+          <InventoryList
+            items={inventory}
+            categoryFilter={selectedCategory}
+            onDelete={handleDeleteItem}
+          />
+
         </div>
       </div>
 
