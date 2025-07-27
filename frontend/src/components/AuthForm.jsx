@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+
 export default function AuthForm({ mode }) {
   const navigate = useNavigate();
   const isSignup = mode === "signup";
+  const [selectedRole, setSelectedRole] = useState("Supplier"); // default to buyer
+
 
   // --- STATE MANAGEMENT ---
   // State for each input field and for handling API errors
@@ -49,11 +52,16 @@ export default function AuthForm({ mode }) {
       localStorage.setItem("authToken", data.token);
 
       // Navigate to the correct page after a successful action
-      if (isSignup) {
-        navigate("/language");
-      } else {
-        navigate("/dashboard");
-      }
+    if (isSignup) {
+  navigate("/language");
+} else {
+  // INVERTED: buyer → /Vendorhomepage, vendor → /dashboard
+      if (selectedRole === "Supplier") {
+    navigate("/dashboard");
+  } else {
+  navigate("/Vendorhomepage");
+  }
+}
 
     } catch (err) {
       // --- HANDLE ERRORS ---
@@ -83,6 +91,30 @@ export default function AuthForm({ mode }) {
           <h3 className="text-3xl font-bold text-gray-800 mb-8">
             {isSignup ? "Create Account" : "Login"}
           </h3>
+
+          <div className="flex justify-center space-x-4 mb-6">
+            <button
+              type="button"
+              onClick={() => setSelectedRole("Supplier")}
+              className={`px-4 py-2 rounded-md font-medium border ${selectedRole === "Supplier"
+                  ? "bg-indigo-500 text-white"
+                  : "bg-white text-gray-700"
+                }`}
+            >
+              Supplier
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole("vendor")}
+              className={`px-4 py-2 rounded-md font-medium border ${selectedRole === "vendor"
+                  ? "bg-indigo-500 text-white"
+                  : "bg-white text-gray-700"
+                }`}
+            >
+              Vendor
+            </button>
+          </div>
+
 
           <form onSubmit={handleSubmit} className="w-full space-y-6">
             {isSignup && (
