@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCarrot, FaAppleAlt, FaCheese, FaOilCan, FaStore, FaDrumstickBite, FaLeaf, FaHotdog } from 'react-icons/fa';
@@ -249,6 +250,7 @@ const Vendorhomepage = () => {
             </main>
         </div>
     );
-};
+
+  }
 
 export default Vendorhomepage;
