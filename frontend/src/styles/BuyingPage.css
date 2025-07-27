@@ -17,24 +17,25 @@
 }
 
 .back-button {
-    background-color: #fff;
-    border: 1px solid #d1d5db;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-    color: #4b5563;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #eef2ff;
+  color: #4f46e5;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease;
 }
 
 .back-button:hover {
-    background-color: #f3f4f6;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  background-color: #e0e7ff;
 }
+
 
 .buying-page-header h1 {
     font-size: 1.75rem;
@@ -44,24 +45,30 @@
 
 /* Supplier Grid Layout */
 .supplier-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem;
 }
+
 
 /* Individual Supplier Card */
 .supplier-card {
-    background-color: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 280px;
+  background-color: #fff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .supplier-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
 }
+
 
 .supplier-image {
     width: 100%;
