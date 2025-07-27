@@ -5,27 +5,25 @@ import '../styles/BuyingPage.css';
 const BuyingPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
-  
+
   const [product, setProduct] = useState(null);
-  // This will now store the combined supplier and pricing info
   const [supplierOfferings, setSupplierOfferings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [selectedOffering, setSelectedOffering] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [cardPosition, setCardPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/suppliers/`);
+        const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/`);
         if (!response.ok) {
-          throw new Error('Failed to fetch suppliers');
+          throw new Error('Failed to fetch product details');
         }
         const data = await response.json();
         setProduct(data);
-        // The supplier data is now in a nested 'suppliers' array
         setSupplierOfferings(data.suppliers);
       } catch (err) {
         setError(err.message);
@@ -34,8 +32,28 @@ const BuyingPage = () => {
       }
     };
 
-    fetchSuppliers();
-  }, [productId]); // Re-run the effect if the productId changes
+    fetchProductDetails();
+  }, [productId]);
+
+  // Renamed function to match your new code
+  const calculateDiscountedTotal = (basePrice, quantity) => {
+    let discount = 0;
+    if (quantity >= 5 && quantity < 10) discount = 0.05;
+    else if (quantity >= 10 && quantity < 20) discount = 0.1;
+    else if (quantity >= 20) discount = 0.15;
+    const total = basePrice * quantity;
+    return Math.round(total - total * discount);
+  };
+
+  const handleSelect = (offering, e) => {
+    const rect = e.target.getBoundingClientRect();
+    setCardPosition({
+      top: rect.top + window.scrollY - 40,
+      left: rect.left + rect.width - 80
+    });
+    setSelectedOffering(offering);
+    setQuantity(1);
+  };
 
   if (loading) return <div className="loading-container">Loading Details...</div>;
   if (error) return <div className="error-container">Error: {error}</div>;
@@ -46,14 +64,15 @@ const BuyingPage = () => {
         <button onClick={() => navigate(-1)} className="back-button">← Back</button>
         <h1>Available Suppliers for {product?.name}</h1>
       </header>
+
       <main className="supplier-grid">
         {supplierOfferings.length > 0 ? (
           supplierOfferings.map(offering => (
             <div key={offering.supplier.id} className="supplier-card">
-              <img 
-                src={offering.supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${offering.supplier.name}`} 
-                alt={offering.supplier.name} 
-                className="supplier-image" 
+              <img
+                src={offering.supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${offering.supplier.name}`}
+                alt={offering.supplier.name}
+                className="supplier-image"
               />
               <div className="supplier-info">
                 <h3 className="supplier-name">{offering.supplier.name}</h3>
@@ -62,13 +81,16 @@ const BuyingPage = () => {
                   <span>•</span>
                   <span>{offering.supplier.delivery_time}</span>
                 </div>
-                
-                {/* --- MODIFIED: Display the price from the offering --- */}
                 <div className="supplier-pricing">
                   <span className="price-amount">₹{parseFloat(offering.price).toFixed(2)}</span>
-                  <span className="price-unit">{offering.unit}</span>
+                  <span className="price-unit">/{offering.unit}</span>
                 </div>
-                <button className="select-supplier-btn">Select</button>
+                <button
+                  className="select-supplier-btn"
+                  onClick={(e) => handleSelect(offering, e)}
+                >
+                  Select
+                </button>
               </div>
             </div>
           ))
@@ -77,38 +99,39 @@ const BuyingPage = () => {
         )}
       </main>
 
-      {selectedSupplier && (
-        <div 
+      {/* --- MODIFIED: Floating card section updated with your new code --- */}
+      {selectedOffering && (
+        <div
           className="floating-card"
           style={{
             top: `${cardPosition.top}px`,
             left: `${cardPosition.left}px`,
-            transform: 'translateX(-50%)'
           }}
         >
-          <button className="close-btn" onClick={() => setSelectedSupplier(null)}>✕</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>{selectedOffering.supplier.name}</h3>
+            <button onClick={() => setSelectedOffering(null)} style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+          </div>
 
-          <h3>{selectedSupplier.name}</h3>
-          <p className="address">📍 {selectedSupplier.address || "Gandhinagar, Gujarat"}</p>
-          <p className="base-price">Base Price: ₹{selectedSupplier.base_price || 50}/kg</p>
+          <p style={{ color: '#ef4444', marginBottom: '4px' }}>📍 Gujarat, India</p>
+          <p>Base Price: ₹{parseFloat(selectedOffering.price).toFixed(2)}/{selectedOffering.unit}</p>
 
-          <div className="quantity-block">
-            <label>Quantity (kg):</label>
-            <input 
+          <div style={{ marginTop: '0.75rem' }}>
+            <label>Quantity (in {selectedOffering.unit}):</label>
+            <input
               type="number"
-              min={1}
+              min="1"
               value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
+              onChange={(e) => setQuantity(e.target.value)}
+              style={{ width: '60px', marginLeft: '0.5rem' }}
             />
           </div>
 
-          <p className="price-summary">
-            Total: ₹{calculatePrice(selectedSupplier.base_price || 50, quantity)}
-          </p>
+          <p style={{ marginTop: '0.5rem' }}>Total: ₹{calculateDiscountedTotal(selectedOffering.price, quantity)}</p>
 
-          <div className="button-actions">
-            <button className="add-cart">Add to Cart</button>
-            <button className="buy-now">Buy Now</button>
+          <div className="button-row">
+            <button className="add-btn">Add to Cart</button>
+            <button className="buy-btn">Buy Now</button>
           </div>
         </div>
       )}
@@ -117,4 +140,3 @@ const BuyingPage = () => {
 };
 
 export default BuyingPage;
-
