@@ -8,8 +8,14 @@ class SupplierProductPriceInline(admin.TabularInline):
 
 class ProductAdmin(admin.ModelAdmin):
     inlines = (SupplierProductPriceInline,)
-    list_display = ('name', 'category')
-    list_filter = ('category',)
+    # MODIFIED: Added 'is_deal_of_the_day' for better visibility in the list
+    list_display = ('name', 'category', 'is_deal_of_the_day')
+    list_filter = ('category', 'is_deal_of_the_day')
+    # MODIFIED: Added a search bar to search by product name or category
+    search_fields = ('name', 'category__name')
+    # MODIFIED: This allows you to toggle the 'deal of the day' flag
+    # directly from the product list page without editing the whole product.
+    list_editable = ('is_deal_of_the_day',)
 
 admin.site.register(Category)
 admin.site.register(Product, ProductAdmin)

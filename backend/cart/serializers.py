@@ -1,8 +1,8 @@
-# cart/serializers.py
 from rest_framework import serializers # type: ignore
 from .models import Cart, CartItem
+
 class CartItemSerializer(serializers.ModelSerializer):
-    # These two lines are crucial. They fetch the names from the related models.
+    # These lines are crucial for showing names in the cart
     product_name = serializers.CharField(source='product.name', read_only=True)
     supplier_name = serializers.CharField(source='supplier.name', read_only=True)
 
