@@ -9,5 +9,7 @@ urlpatterns = [
     path('api/', include('products.urls')), # Add this line
     path('api/cart/', include('cart.urls')),
     path('api/orders/', include('orders.urls')),
+    path('api/', include('inventory.urls')),
+
      
 ]   
