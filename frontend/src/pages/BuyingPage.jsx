@@ -5,7 +5,7 @@ import '../styles/BuyingPage.css';
 const BuyingPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
-
+  
   const [product, setProduct] = useState(null);
   const [supplierOfferings, setSupplierOfferings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,6 @@ const BuyingPage = () => {
     fetchProductDetails();
   }, [productId]);
 
-  // Renamed function to match your new code
   const calculateDiscountedTotal = (basePrice, quantity) => {
     let discount = 0;
     if (quantity >= 5 && quantity < 10) discount = 0.05;
@@ -64,15 +63,15 @@ const BuyingPage = () => {
         <button onClick={() => navigate(-1)} className="back-button">← Back</button>
         <h1>Available Suppliers for {product?.name}</h1>
       </header>
-
+      
       <main className="supplier-grid">
         {supplierOfferings.length > 0 ? (
           supplierOfferings.map(offering => (
             <div key={offering.supplier.id} className="supplier-card">
-              <img
-                src={offering.supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${offering.supplier.name}`}
-                alt={offering.supplier.name}
-                className="supplier-image"
+              <img 
+                src={offering.supplier.image || `https://placehold.co/200x150/a7c5ff/333?text=${offering.supplier.name}`} 
+                alt={offering.supplier.name} 
+                className="supplier-image" 
               />
               <div className="supplier-info">
                 <h3 className="supplier-name">{offering.supplier.name}</h3>
@@ -81,10 +80,14 @@ const BuyingPage = () => {
                   <span>•</span>
                   <span>{offering.supplier.delivery_time}</span>
                 </div>
+                
+                {/* --- MODIFIED: Added a dynamic price indicator --- */}
                 <div className="supplier-pricing">
                   <span className="price-amount">₹{parseFloat(offering.price).toFixed(2)}</span>
                   <span className="price-unit">/{offering.unit}</span>
+                  <span className="dynamic-price-indicator" title="Price is adjusted based on current conditions">⚡</span>
                 </div>
+
                 <button
                   className="select-supplier-btn"
                   onClick={(e) => handleSelect(offering, e)}
@@ -99,7 +102,7 @@ const BuyingPage = () => {
         )}
       </main>
 
-      {/* --- MODIFIED: Floating card section updated with your new code --- */}
+      {/* Floating card on select */}
       {selectedOffering && (
         <div
           className="floating-card"
@@ -113,7 +116,9 @@ const BuyingPage = () => {
             <button onClick={() => setSelectedOffering(null)} style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
           </div>
 
-          <p style={{ color: '#ef4444', marginBottom: '4px' }}>📍 Gujarat, India</p>
+          <p style={{ color: '#ef4444', marginBottom: '4px' }}>
+            📍 {selectedOffering.supplier.address || "Address not available"}
+          </p>
           <p>Base Price: ₹{parseFloat(selectedOffering.price).toFixed(2)}/{selectedOffering.unit}</p>
 
           <div style={{ marginTop: '0.75rem' }}>

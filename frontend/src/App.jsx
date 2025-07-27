@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import AuthForm from './components/AuthForm';
 import Dashboard from './pages/SupplierDashboard';
 import LanguagePage from './pages/LanguagePage';
-import './App.css';
 import Vendorhomepage from './pages/Vendorhomepage';
 import ReviewPage from "./pages/ReviewPage"; 
 import AnalyticsPage from './pages/AnalyticsPage';
 import BuyingPage from './pages/BuyingPage';
+import CartPage from './pages/CartPage'; // Import the CartPage
+import './App.css';
 
-function App() {
-  // Add state to manage the selected language across the application
+// This new component will contain all the routing logic.
+// This is a clean pattern that ensures useNavigate works correctly.
+function AppRoutes() {
+  // State to manage the selected language across the application
   const [language, setLanguage] = useState('en');
-  const navigate = useNavigate(); // Initialize the navigate hook
+  const navigate = useNavigate();
 
-  // This function will be passed to LanguagePage to update the state
+  // This function is passed to LanguagePage to update the state and navigate
   const handleLanguageSelect = (langId) => {
     setLanguage(langId);
     // After setting the language, navigate to the vendor homepage
@@ -23,31 +26,36 @@ function App() {
 
   return (
     <Routes>
+      {/* Auth Routes */}
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<AuthForm mode="login" />} />
       <Route path="/signup" element={<AuthForm mode="signup" />} />
       
-      {/* Modified: LanguagePage now receives the prop that handles state and navigation */}
+      {/* Main App Flow */}
       <Route 
         path="/language" 
         element={<LanguagePage onLanguageSelect={handleLanguageSelect} />} 
       />
-      
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/dashboard/review" element={<ReviewPage />} />
-      
-      {/* Modified: Vendorhomepage receives the current language as a prop */}
       <Route 
         path="/Vendorhomepage" 
         element={<Vendorhomepage language={language} />} 
       />
-      
-      <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
-
-      {/* Added: New dynamic route for the BuyingPage */}
       <Route path="/buy/:productId" element={<BuyingPage />} />
+      <Route path="/cart" element={<CartPage />} /> {/* Added Cart Route */}
+
+      {/* Dashboard Routes */}
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard/review" element={<ReviewPage />} />
+      <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
     </Routes>
   );
+}
+
+
+// The main App component now simply renders the AppRoutes.
+// Note: Your main.jsx file must wrap <App /> in <BrowserRouter>.
+function App() {
+  return <AppRoutes />;
 }
 
 export default App;

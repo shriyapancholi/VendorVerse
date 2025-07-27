@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCarrot, FaAppleAlt, FaCheese, FaOilCan, FaStore, FaDrumstickBite, FaLeaf, FaHotdog } from 'react-icons/fa';
+import { FaCarrot, FaAppleAlt, FaCheese, FaOilCan, FaStore, FaDrumstickBite, FaLeaf, FaHotdog, FaShoppingCart } from 'react-icons/fa';
 import '../styles/Vendorhomepage.css'; // Ensure this path is correct
 
 // Helper to map category names to icons
@@ -24,22 +23,21 @@ const Vendorhomepage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [cartItemCount, setCartItemCount] = useState(0); // State for cart count
 
     const navRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAllData = async () => {
+            const token = localStorage.getItem('authToken');
             try {
+                // Fetch main data
                 const [categoryResponse, dealsResponse] = await Promise.all([
                     fetch('http://127.0.0.1:8000/api/categories/'),
                     fetch('http://127.0.0.1:8000/api/deals/')
                 ]);
-
-                if (!categoryResponse.ok || !dealsResponse.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
+                if (!categoryResponse.ok || !dealsResponse.ok) throw new Error('Network response was not ok');
                 const categoryData = await categoryResponse.json();
                 const dealsData = await dealsResponse.json();
                 
@@ -52,19 +50,24 @@ const Vendorhomepage = () => {
                 setCategories(categoryList);
                 setProducts(productMap);
                 setDeals(dealsData);
-                
-                if (categoryList.length > 0) {
-                    setActiveCategory(categoryList[0].name);
-                }
+                if (categoryList.length > 0) setActiveCategory(categoryList[0].name);
 
+                // Fetch cart count if user is logged in
+                if (token) {
+                    const cartCountResponse = await fetch('http://127.0.0.1:8000/api/cart/item-count/', {
+                        headers: { 'Authorization': `Token ${token}` }
+                    });
+                    if (cartCountResponse.ok) {
+                        const cartData = await cartCountResponse.json();
+                        setCartItemCount(cartData.item_count);
+                    }
+                }
             } catch (error) {
                 setError(error.message);
-                console.error("Failed to fetch data:", error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchAllData();
     }, []);
 
@@ -90,7 +93,6 @@ const Vendorhomepage = () => {
             navigate('/login');
             return;
         }
-
         try {
             await fetch('http://127.0.0.1:8000/api/users/logout/', {
                 method: 'POST',
@@ -153,6 +155,15 @@ const Vendorhomepage = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
+
+                        <div className="user-action cart-action" onClick={() => navigate('/cart')}>
+                            <div className="cart-icon-wrapper">
+                                <FaShoppingCart size={24} />
+                                {cartItemCount > 0 && <span className="cart-count">{cartItemCount}</span>}
+                            </div>
+                            <span>Cart</span>
+                        </div>
+
                         <div className="user-action" onClick={handleLogout}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             <span>Logout</span>
@@ -250,7 +261,6 @@ const Vendorhomepage = () => {
             </main>
         </div>
     );
-
-  }
+};
 
 export default Vendorhomepage;
