@@ -115,8 +115,9 @@
 }
 
 .category-nav button {
-    background: #e0f2fe;
-    border: none;
+    background: white;
+    color: black;
+    border: 1px solid #d1d5db;
     padding: 0.5rem 1rem;
     border-radius: 999px;
     cursor: pointer;
@@ -126,8 +127,9 @@
 
 .category-nav button.active,
 .category-nav button:hover {
-    background: linear-gradient(to right, #3b82f6, #6366f1);
-    color: white;
+    background: #e5e7eb;
+    /* light grey on hover/active */
+    color: black;
 }
 
 /* Inventory Section */
@@ -344,4 +346,41 @@
 .location-selector {
     margin-top: 0;
     /* remove any existing top margin if present */
+}
+
+.white-btn {
+    background-color: white;
+    color: black;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.white-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.back-button {
+    background-color: white;
+    color: black;
+    font-weight: 600;
+    font-size: 0.875rem;
+    /* text-sm */
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    /* light gray */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: #f3f4f6;
+    /* subtle hover */
 }
